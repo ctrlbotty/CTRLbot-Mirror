@@ -1,154 +1,129 @@
 # CTRLbot Mirror
 
-A Windows app for mirroring, controlling and **capturing** Android devices — built for making
-training videos that look good, and for helping people get their phone talking to their PC.
+CTRLbot Mirror is a Windows desktop app for showing an Android phone on your PC, controlling it
+with your mouse and keyboard, and capturing polished screenshots or recordings.
 
-<!-- Screenshots go here once the first build is cut. -->
-
----
-
-## What it actually does
-
-Despite the name, this does **not** run a virtual Android on your PC by default. It mirrors a _real_
-device over ADB — which is both faster and more honest for training material, because what you
-record is what your users will actually see on their own phone. (Virtual devices are supported too,
-if you have the Android emulator installed; see [Virtual devices](#virtual-devices).)
-
-See [`docs/RESEARCH.md`](docs/RESEARCH.md) for why mirroring beat emulation for this use case.
-
-### Two audiences, one app
-
-**For recording training material**
-
-- Live mirror at up to native resolution, 60 fps, ~35–70 ms latency
-- Device frames drawn around the screen (Pixel / Galaxy / flat / plain), on a backdrop you choose
-- One-key screenshots at 1×, 2× or 3× — saved straight to a folder, no save dialog in your way
-- Screen recording of the **composed** stage (frame, backdrop and all) to WebM or MP4
-- Touch ripples so viewers can see where you tapped
-- Clean mode (hide every bit of app chrome) for a borderless capture
-- "Blank the device screen" so the phone in your hand looks off while you record
-
-**For helping someone connect their device**
-
-- Guided setup that detects what is missing and fixes what it can
-- Downloads Google's official platform-tools automatically — no manual SDK install
-- Plain-English steps for Developer options, USB debugging and the authorisation prompt
-- One-click switch from USB to wireless ADB, plus Android 11+ pairing-code support
-- App manager, file browser, shell and logcat for the fiddly parts of setup
-
----
-
-## Install
-
-Grab the installer or the portable build from
-[Releases](https://github.com/ctrlbotty/CTRLbot-Mirror/releases), or build it yourself:
-
-```bash
-npm install
-npm run dev
-```
-
-Requires **Node 22.12+**. `npm install` downloads the scrcpy server jar (~90 KB, checksum-pinned);
-`adb.exe` is fetched on first run from Google if your machine does not already have it.
-
-To produce an installer:
-
-```bash
-npm run dist
-```
-
----
+It is useful for product demos, training videos, app walkthroughs, support sessions, and everyday
+device setup. It works with a physical Android device over USB or Wi-Fi and with Android Studio
+virtual devices.
 
 ## Quick start
 
-1. Open the app. If ADB is missing, **Setup → Install now** fetches it.
-2. On the phone: Settings → About phone → tap **Build number** seven times → Developer options →
-   turn on **USB debugging**.
-3. Plug the phone in with a **data** cable (charge-only cables are the usual culprit when nothing
-   shows up).
-4. Tap **Allow** on the "Allow USB debugging?" prompt, ticking _Always allow from this computer_.
-5. **Devices → Start mirroring.**
+With [Node.js 22.12 or newer](https://nodejs.org/) installed, open a terminal in this folder and run:
 
-### Controls
+```powershell
+npm run setup:windows
+```
 
-| Input                              | Does                                                |
-| ---------------------------------- | --------------------------------------------------- |
-| Left click / drag                  | Tap, swipe                                          |
-| Right click                        | Back                                                |
-| Middle click                       | Home                                                |
-| Scroll wheel                       | Scroll                                              |
-| Typing                             | Injected as text (IMEs, accents and emoji all work) |
-| Arrows, Enter, Backspace, Esc, Tab | Sent as Android key events                          |
-| `Ctrl` + `V`                       | Paste the PC clipboard into the device              |
-| `Esc`                              | Leave clean mode                                    |
+That one command installs the app's dependencies, builds the Windows app, and creates a
+**CTRLbot Mirror** shortcut on your desktop. Double-click the shortcut whenever you want to open the
+app.
 
-The toolbar under the stage has Back / Home / Recents, rotate, volume, power, the notification
-shade, screenshot, record and clean mode.
+To open the source version immediately without creating a packaged app, run this single line from
+Command Prompt or PowerShell:
 
----
+```powershell
+cmd /c "npm install && npm run dev"
+```
+
+Once built, the app itself does not require Node.js to be running.
+
+## Connect your first device
+
+1. Open CTRLbot Mirror. If Android platform-tools are missing, open **Setup** and select
+   **Install now**.
+2. On the phone, open **Settings → About phone** and tap **Build number** seven times.
+3. Open **Developer options** and turn on **USB debugging**.
+4. Connect the phone with a data-capable USB cable.
+5. Unlock the phone and accept **Allow USB debugging?** Select **Always allow from this computer**
+   if this is your PC.
+6. In CTRLbot Mirror, open **Devices**, select the phone, and choose **Start mirroring**.
+
+If the phone does not appear, try another cable first; many USB cables provide power but do not
+carry data. See [Troubleshooting](docs/TROUBLESHOOTING.md) for connection and driver help.
+
+## What you can do
+
+- Mirror a phone or tablet at up to its native resolution and 60 fps.
+- Tap, swipe, scroll, type, paste, and use Android navigation from your PC.
+- Add a clean phone frame, backdrop, padding, shadow, and visible touch ripples.
+- Save instant screenshots at 1×, 2×, or 3× scale.
+- Record the composed stage—including its frame and backdrop—to WebM or MP4.
+- Hide the app chrome with Clean mode for distraction-free capture.
+- Switch a connected phone from USB to wireless ADB.
+- Install and manage apps, browse files, run shell commands, and view logcat.
+- Start Android Studio virtual devices and use the same mirror and capture tools with them.
+
+Screenshots and recordings go to **Pictures\CTRLbot Mirror** by default. Change or open that folder
+from **Studio → Capture**.
+
+## Controls
+
+| Input                              | Action                                      |
+| ---------------------------------- | ------------------------------------------- |
+| Left click or drag                 | Tap or swipe                                |
+| Right click                        | Back                                        |
+| Middle click                       | Home                                        |
+| Scroll wheel                       | Scroll                                      |
+| Keyboard typing                    | Type on the Android device                  |
+| Arrows, Enter, Backspace, Esc, Tab | Send the matching Android key               |
+| `Ctrl` + `V`                       | Paste the Windows clipboard into the device |
+| `Esc` in Clean mode                | Show the app controls again                 |
+
+The toolbar below the mirrored screen also provides Back, Home, Recents, notifications, rotation,
+volume, power, screenshot, record, Clean mode, and stop controls.
+
+## Open it from a desktop shortcut
+
+`npm run setup:windows` creates the shortcut as part of the initial setup. To recreate it later, run
+`npm run shortcut`.
+
+The Windows installer will also create desktop and Start Menu shortcuts when packaged releases are
+published. For a standalone portable `.exe`, first keep it in a permanent folder, then either:
+
+- Right-click the `.exe`, select **Show more options → Send to → Desktop (create shortcut)**, or
+- From this repository, run `npm run shortcut` after building the portable app.
+
+The shortcut command looks for an installed copy first, then
+`release\win-unpacked\CTRLbot Mirror.exe`, then the newest portable build. You can also choose an
+exact executable:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1 -TargetPath "C:\Apps\CTRLbot Mirror.exe"
+```
+
+## Wireless devices
+
+For a phone already connected over USB, select **Go wireless** on its device card. Once CTRLbot
+Mirror confirms the Wi-Fi address, you can unplug the cable.
+
+On Android 11 or newer, you can also open **Developer options → Wireless debugging → Pair device
+with pairing code** and enter the displayed address and code in the **Devices** panel. The PC and
+phone must be on the same local network.
 
 ## Virtual devices
 
-If you have Android Studio's emulator installed, **Virtual devices** lists your AVDs and boots them.
-A running emulator shows up as an ordinary device, so mirroring, control and every capture feature
-work on it unchanged. Nothing here requires the SDK — the panel simply stays empty without it.
+If Android Studio's emulator is installed, the **Virtual devices** panel lists your Android Virtual
+Devices (AVDs). Start one there, wait for it to finish booting, and then select it in **Devices**.
+CTRLbot Mirror does not require Android Studio when you use a physical device.
 
----
+## Privacy and downloads
 
-## How it is put together
+CTRLbot Mirror has no account requirement and sends no telemetry. Device traffic stays on USB or
+your local network.
 
-```
-Android device ──scrcpy server (on device)──┐
-                                            │  H.264/H.265/AV1 over an ADB socket
-                                            ▼
-  Electron main ── @yume-chan/adb ── ADB server (adb.exe, port 5037)
-        │
-        │  MessagePort (video only, off the main IPC bus)
-        ▼
-  Renderer ── WebCodecs decode ── WebGL canvas ── screenshots / MediaRecorder
-```
+If `adb.exe` is not already available, the app downloads Google's Android platform-tools from
+`dl.google.com` only after you select **Install now**. A source install also downloads the small
+scrcpy server component used on the Android device.
 
-The short version: the main process speaks the ADB and scrcpy protocols in TypeScript, and the
-renderer decodes video with the GPU decoder Chromium already ships. Frames landing on a real canvas
-is what makes the Studio features possible at all.
+## Help and reference
 
-Full detail — including why video gets its own MessagePort and why we download adb instead of
-bundling it — is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+- [User guide](docs/USER_GUIDE.md) — detailed instructions for every feature
+- [Troubleshooting](docs/TROUBLESHOOTING.md) — device, driver, ADB, and capture problems
+- [Roadmap](docs/ROADMAP.md) — planned improvements
 
----
+For development setup and project internals, see [Contributing](CONTRIBUTING.md) and
+[Architecture](docs/ARCHITECTURE.md).
 
-## Docs
-
-|                                                      |                                                       |
-| ---------------------------------------------------- | ----------------------------------------------------- |
-| [`docs/RESEARCH.md`](docs/RESEARCH.md)               | Why mirroring over emulation, and which libraries won |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)       | Process model, data flow, module map                  |
-| [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md)           | Every feature, in order                               |
-| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | When a device will not show up                        |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md)                 | What is next                                          |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md)                 | Dev setup and conventions                             |
-
----
-
-## Third-party components
-
-| Component                                                            | Licence           | How it is used                                             |
-| -------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------- |
-| [scrcpy](https://github.com/Genymobile/scrcpy) server                | Apache-2.0        | Fetched at install time, pushed to the device, run there   |
-| [Tango ADB](https://github.com/yume-chan/ya-webadb) (`@yume-chan/*`) | MIT               | TypeScript ADB + scrcpy protocol client                    |
-| Android SDK platform-tools (`adb.exe`)                               | Android SDK Terms | **Downloaded from Google at runtime, never redistributed** |
-| [Electron](https://electronjs.org), React, Tailwind                  | MIT               | App shell and UI                                           |
-
-CTRLbot Mirror itself is Apache-2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
-
----
-
-## Privacy
-
-No telemetry, no accounts, no network calls except two, both to first-party hosts and both visible
-in the UI:
-
-- `dl.google.com` — the platform-tools download, only when you press Install
-- `github.com` — the scrcpy server jar, at `npm install` time only
-
-Everything else is local: USB, or your own LAN for wireless ADB.
+CTRLbot Mirror is licensed under the [Apache License 2.0](LICENSE). Third-party notices are in
+[NOTICE](NOTICE).
