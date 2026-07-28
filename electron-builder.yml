@@ -1,0 +1,49 @@
+appId: com.ctrlbot.mirror
+productName: CTRLbot Mirror
+copyright: Copyright © 2026 CTRLbot
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - out/**/*
+  - package.json
+  - '!**/*.map'
+  - '!**/{.eslintrc,.prettierrc,tsconfig*.json}'
+
+extraResources:
+  # scrcpy-server.jar is fetched at install time by scripts/fetch-scrcpy-server.mjs.
+  # It is pushed to the device at runtime, never executed on Windows.
+  - from: resources/scrcpy-server.jar
+    to: scrcpy-server.jar
+
+asar: true
+asarUnpack:
+  - '**/node_modules/@yume-chan/**'
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: CTRLbot Mirror
+  deleteAppDataOnUninstall: false
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+publish:
+  provider: github
+  owner: ctrlbotty
+  repo: CTRLbot-Mirror
+  releaseType: release

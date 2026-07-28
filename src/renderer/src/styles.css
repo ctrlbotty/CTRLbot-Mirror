@@ -1,0 +1,138 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink-950: #060910;
+  --color-ink-900: #0b0f19;
+  --color-ink-850: #101624;
+  --color-ink-800: #151d2e;
+  --color-ink-700: #1e2739;
+  --color-ink-600: #2b3348;
+  --color-ink-500: #48546b;
+
+  --color-mist-100: #eef2f8;
+  --color-mist-200: #cdd6e5;
+  --color-mist-300: #9dabc2;
+  --color-mist-400: #6f7f99;
+
+  --color-signal-400: #4ade80;
+  --color-signal-500: #22c55e;
+
+  --color-beam-300: #7dd3fc;
+  --color-beam-400: #38bdf8;
+  --color-beam-500: #0ea5e9;
+  --color-beam-600: #0284c7;
+
+  --color-flare-400: #a78bfa;
+  --color-flare-500: #8b5cf6;
+
+  --color-warn-400: #fbbf24;
+  --color-alert-400: #f87171;
+  --color-alert-500: #ef4444;
+
+  --font-sans:
+    'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Cascadia Code', 'Consolas', ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2b3348 transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--color-ink-900);
+    color: var(--color-mist-200);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    /* Nothing in the chrome should be selectable — this is an app, not a page. */
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2b3348;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3b465f;
+    background-clip: content-box;
+  }
+
+  input,
+  textarea {
+    user-select: text;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer utilities {
+  .drag-region {
+    -webkit-app-region: drag;
+  }
+
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+
+  .selectable {
+    user-select: text;
+  }
+
+  /* Keeps mirrored pixels crisp when the stage scales the canvas up. */
+  .pixel-exact {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+@keyframes ripple-out {
+  from {
+    transform: scale(0.35);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-ripple {
+  animation: ripple-out 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-rise {
+  animation: rise-in 180ms ease-out both;
+}

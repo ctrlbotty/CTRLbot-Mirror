@@ -1,0 +1,42 @@
+CTRLbot Mirror
+Copyright 2026 CTRLbot
+
+This product includes software developed by third parties.
+
+--------------------------------------------------------------------------------
+scrcpy — https://github.com/Genymobile/scrcpy
+Copyright (C) 2018 Genymobile
+Copyright (C) 2018-2026 Romain Vimont
+Licensed under the Apache License, Version 2.0
+
+The scrcpy *server* binary (scrcpy-server.jar) is downloaded unmodified from the
+official Genymobile/scrcpy GitHub release at install time and redistributed
+inside this application's installer. It is pushed to the connected Android
+device and executed there; it never runs on the host.
+
+--------------------------------------------------------------------------------
+Tango ADB — https://github.com/yume-chan/ya-webadb
+Copyright (c) Simon Chan
+Licensed under the MIT License
+
+Provides the TypeScript implementations of the ADB and scrcpy client protocols
+(@yume-chan/adb, @yume-chan/adb-scrcpy, @yume-chan/scrcpy,
+@yume-chan/scrcpy-decoder-webcodecs, @yume-chan/adb-server-node-tcp,
+@yume-chan/stream-extra and their dependencies).
+
+--------------------------------------------------------------------------------
+Android SDK Platform-Tools (adb.exe)
+Copyright (C) The Android Open Source Project
+Subject to the Android Software Development Kit License Agreement
+
+NOT REDISTRIBUTED. CTRLbot Mirror downloads platform-tools directly from
+Google (https://dl.google.com/android/repository/platform-tools-latest-windows.zip)
+onto the user's machine at first run, or uses a copy the user already has. No
+Android SDK binary is included in this repository or in the installer.
+
+--------------------------------------------------------------------------------
+Electron — https://github.com/electron/electron — MIT
+React — https://github.com/facebook/react — MIT
+Tailwind CSS — https://github.com/tailwindlabs/tailwindcss — MIT
+Zustand — https://github.com/pmndrs/zustand — MIT
+Lucide — https://github.com/lucide-icons/lucide — ISC

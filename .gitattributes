@@ -1,0 +1,14 @@
+# Normalise line endings to LF everywhere — in the repo and in the working tree.
+#
+# Without this, Git's core.autocrlf on Windows rewrites checkouts to CRLF while
+# Prettier is configured with endOfLine: lf. CI runs `format:check` on
+# windows-latest against a fresh checkout, so the two would disagree and the
+# build would fail on a tree nobody had touched.
+* text=auto eol=lf
+
+*.jar binary
+*.ico binary
+*.bmp binary
+*.png binary
+*.jpg binary
+*.exe binary

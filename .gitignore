@@ -1,0 +1,27 @@
+node_modules/
+out/
+dist/
+release/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Vendored binaries are fetched at install time, never committed.
+resources/scrcpy-server.jar
+resources/platform-tools/
+
+# Local environment
+.env
+.env.local
+local.properties
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+
+# Build caches
+.vite/
+*.tsbuildinfo
