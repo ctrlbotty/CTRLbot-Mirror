@@ -1,5 +1,6 @@
 import { AdbServerClient } from '@yume-chan/adb';
 import { AdbServerNodeTcpConnector } from '@yume-chan/adb-server-node-tcp';
+import { setTimeout as delay } from 'node:timers/promises';
 import { ADB_SERVER_HOST, ADB_SERVER_PORT } from '@shared/constants.js';
 import type { DownloadProgress, EnvironmentStatus } from '@shared/types.js';
 import { describeError, scoped } from './logger.js';
@@ -8,6 +9,8 @@ import { locateScrcpyServer } from './scrcpy-server-bin.js';
 import { locateAndroidSdk } from './avd.js';
 
 const log = scoped('adb-server');
+const SERVER_START_TIMEOUT_MS = 15_000;
+const SERVER_PROBE_INTERVAL_MS = 250;
 
 /**
  * Owns the connection to the local ADB server.
@@ -48,6 +51,19 @@ class AdbServerService {
     return this.status();
   }
 
+  /** Starts ADB when it is already installed, without triggering a download. */
+  async initialiseInstalled(): Promise<EnvironmentStatus> {
+    this.#adb = await resolveAdb();
+    if (!this.#adb) {
+      this.#client = null;
+      this.#serverVersion = null;
+      return this.status();
+    }
+
+    await this.startServer();
+    return this.status();
+  }
+
   /** Re-checks the environment without downloading anything. */
   async refresh(): Promise<EnvironmentStatus> {
     this.#adb = await resolveAdb();
@@ -63,14 +79,23 @@ class AdbServerService {
 
   async startServer(): Promise<void> {
     const adbPath = this.requireAdbPath();
+    let startError: string | null = null;
     try {
       // `start-server` is a no-op when one is already listening.
       await runAdb(adbPath, ['start-server'], 60_000);
     } catch (error) {
-      log.warn('start-server reported an error —', describeError(error));
+      startError = describeError(error);
+      log.warn('start-server reported an error —', startError);
     }
+
     this.#ensureClient();
-    this.#serverVersion = await this.#probeServer();
+    this.#serverVersion = await this.#waitForServer();
+    if (this.#serverVersion === null) {
+      const suffix = startError ? ` Last adb error: ${startError}` : '';
+      throw new Error(
+        `ADB server did not become reachable at ${ADB_SERVER_HOST}:${ADB_SERVER_PORT}.${suffix}`,
+      );
+    }
     log.info('adb server ready, protocol version', this.#serverVersion);
   }
 
@@ -126,12 +151,23 @@ class AdbServerService {
     this.#client = new AdbServerClient(connector);
   }
 
-  async #probeServer(): Promise<number | null> {
+  async #waitForServer(timeout = SERVER_START_TIMEOUT_MS): Promise<number | null> {
+    const deadline = Date.now() + timeout;
+    do {
+      const version = await this.#probeServer(false);
+      if (version !== null) return version;
+      await delay(SERVER_PROBE_INTERVAL_MS);
+    } while (Date.now() < deadline);
+
+    return null;
+  }
+
+  async #probeServer(logFailure = true): Promise<number | null> {
     if (!this.#client) return null;
     try {
       return await this.#client.getVersion();
     } catch (error) {
-      log.warn('adb server not reachable —', describeError(error));
+      if (logFailure) log.warn('adb server not reachable —', describeError(error));
       return null;
     }
   }

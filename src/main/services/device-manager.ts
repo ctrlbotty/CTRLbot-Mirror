@@ -92,7 +92,7 @@ class DeviceManager {
   async list(): Promise<DeviceSummary[]> {
     const client = adbServer.requireClient();
     const devices = await client.getDevices(['device', 'unauthorized', 'offline']);
-    this.#current = devices.map(toSummary);
+    this.#publish(devices);
     return this.#current;
   }
 

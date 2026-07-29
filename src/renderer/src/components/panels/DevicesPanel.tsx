@@ -326,7 +326,10 @@ export function DevicesPanel() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    void api.devices.list().catch(() => undefined);
+    void api.devices
+      .list()
+      .then((devices) => useStore.setState({ devices }))
+      .catch(() => undefined);
   }, []);
 
   const unauthorised = devices.filter((device) => device.state === 'unauthorized');
@@ -342,7 +345,8 @@ export function DevicesPanel() {
           onClick={async () => {
             setRefreshing(true);
             try {
-              await api.devices.list();
+              const devices = await api.devices.list();
+              useStore.setState({ devices });
             } finally {
               setRefreshing(false);
             }

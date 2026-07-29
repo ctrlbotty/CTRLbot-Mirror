@@ -58,7 +58,9 @@ function onProgress(progress: DownloadProgress): void {
 /** Boots ADB and starts the device tracker. Safe to call more than once. */
 export async function bootstrapEnvironment(download: boolean): Promise<void> {
   try {
-    const status = download ? await adbServer.initialise(onProgress) : await adbServer.refresh();
+    const status = download
+      ? await adbServer.initialise(onProgress)
+      : await adbServer.initialiseInstalled();
 
     if (status.adb.serverRunning) {
       await deviceManager.startTracking();
@@ -133,7 +135,7 @@ export function registerIpc(): void {
       settings.set({ adbPathOverride: result.filePaths[0] });
     }
 
-    const status = await adbServer.refresh();
+    const status = await adbServer.initialiseInstalled();
     if (status.adb.serverRunning) await deviceManager.startTracking();
     send(Event.envChanged, status);
     return status;
