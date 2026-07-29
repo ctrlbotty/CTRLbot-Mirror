@@ -8,6 +8,7 @@ import {
   Expand,
   Home,
   Lock,
+  Mic,
   RotateCw,
   Square,
   Volume1,
@@ -107,28 +108,25 @@ export function StageToolbar({
     }
   }, [canvasRef, details?.model, pushToast, session?.serial, studio]);
 
-  const toggleRecording = useCallback(async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !studio) return;
-
-    if (recording) {
+  const finishRecording = useCallback(
+    async (mirrorEnded = false) => {
       setBusy(true);
       try {
         const result = await recorder.current.stop();
-        setRecording(false);
-        setElapsed(0);
         if (!result) return;
 
         const data = new Uint8Array(await result.blob.arrayBuffer());
+        const container = result.mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
         const saved = await api.capture.saveVideo(
           data,
           details?.model ?? session?.serial ?? 'device',
+          container,
         );
 
         if (saved.ok) {
           pushToast({
             level: 'success',
-            title: `Recording saved (${formatDuration(result.durationMs)})`,
+            title: `${mirrorEnded ? 'Mirroring ended — recording saved' : 'Recording saved'} (${formatDuration(result.durationMs)})`,
             detail: saved.path,
           });
         } else {
@@ -137,32 +135,43 @@ export function StageToolbar({
       } catch (error) {
         pushToast({ level: 'error', title: 'Recording failed', detail: errorText(error) });
       } finally {
+        setRecording(false);
+        setElapsed(0);
         setBusy(false);
       }
+    },
+    [details?.model, pushToast, session?.serial],
+  );
+
+  const toggleRecording = useCallback(async () => {
+    if (recording) {
+      await finishRecording();
       return;
     }
 
+    const canvas = canvasRef.current;
+    if (!canvas || !studio) return;
+
+    setBusy(true);
     try {
-      recorder.current.start(
+      await recorder.current.start(
         canvas,
         () => mirror.size,
         () => useStore.getState().settings?.studio ?? studio,
         Math.min(60, settings?.mirror.maxFps || 60),
       );
       setRecording(true);
-      pushToast({ level: 'info', title: 'Recording started' });
+      pushToast({ level: 'info', title: 'Recording started with PC microphone' });
     } catch (error) {
       pushToast({ level: 'error', title: 'Could not start recording', detail: errorText(error) });
+    } finally {
+      setBusy(false);
     }
-  }, [
-    canvasRef,
-    details?.model,
-    pushToast,
-    recording,
-    session?.serial,
-    settings?.mirror.maxFps,
-    studio,
-  ]);
+  }, [canvasRef, finishRecording, pushToast, recording, settings?.mirror.maxFps, studio]);
+
+  useEffect(() => {
+    if (recording && !live && !busy) void finishRecording(true);
+  }, [busy, finishRecording, live, recording]);
 
   return (
     <div className="flex h-14 shrink-0 items-center gap-1 border-t border-ink-800 bg-ink-950/70 px-3">
@@ -254,6 +263,7 @@ export function StageToolbar({
         {recording && (
           <span className="mr-1 flex items-center gap-1.5 rounded-lg bg-alert-500/15 px-2 py-1 text-[11px] font-semibold text-alert-400">
             <span className="size-1.5 animate-pulse rounded-full bg-alert-500" />
+            <Mic size={11} />
             <span className="font-mono tabular-nums">{formatDuration(elapsed)}</span>
           </span>
         )}
@@ -262,9 +272,9 @@ export function StageToolbar({
           <Camera size={17} />
         </IconButton>
         <IconButton
-          label={recording ? 'Stop recording' : 'Record'}
+          label={recording ? 'Stop recording' : 'Record with PC microphone'}
           tone={recording ? 'danger' : 'default'}
-          disabled={!live || busy}
+          disabled={(!live && !recording) || busy}
           onClick={() => void toggleRecording()}
         >
           {recording ? <CircleStop size={18} /> : <Circle size={16} />}

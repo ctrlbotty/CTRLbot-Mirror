@@ -2,8 +2,8 @@ import type { StudioSettings } from '@shared/types.js';
 import { composeFrame } from './compose.js';
 
 const CANDIDATE_TYPES: Record<'webm' | 'mp4', string[]> = {
-  webm: ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'],
-  mp4: ['video/mp4;codecs=avc1.42E01E', 'video/mp4'],
+  webm: ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'],
+  mp4: ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4'],
 };
 
 /** Picks the best container this Chromium build can actually write. */
@@ -26,7 +26,8 @@ export interface RecorderResult {
  * the bare video canvas, so what you record is what you saw.
  *
  * A compositing canvas is redrawn on every animation frame and its
- * `captureStream()` feeds a `MediaRecorder`.
+ * `captureStream()` provides video while `getUserMedia()` adds the PC
+ * microphone. Device audio is intentionally never part of the recording.
  */
 export class StageRecorder {
   #canvas = document.createElement('canvas');
@@ -44,12 +45,12 @@ export class StageRecorder {
     return this.#startedAt === 0 ? 0 : performance.now() - this.#startedAt;
   }
 
-  start(
+  async start(
     source: HTMLCanvasElement,
     getSize: () => { width: number; height: number },
     getStudio: () => StudioSettings,
     fps = 60,
-  ): void {
+  ): Promise<void> {
     if (this.#recorder) return;
 
     const studio = getStudio();
@@ -64,11 +65,21 @@ export class StageRecorder {
     const initial = getSize();
     composeFrame(this.#canvas, source, initial.width, initial.height, studio, 1);
 
-    const stream = this.#canvas.captureStream(fps);
-    const recorder = new MediaRecorder(stream, {
-      mimeType,
-      videoBitsPerSecond: studio.recordingBitrate,
-    });
+    const microphone = await requestMicrophone();
+    const video = this.#canvas.captureStream(fps);
+    const stream = new MediaStream([...video.getVideoTracks(), ...microphone.getAudioTracks()]);
+
+    let recorder: MediaRecorder;
+    try {
+      recorder = new MediaRecorder(stream, {
+        mimeType,
+        videoBitsPerSecond: studio.recordingBitrate,
+        audioBitsPerSecond: 128_000,
+      });
+    } catch (error) {
+      for (const track of stream.getTracks()) track.stop();
+      throw error;
+    }
 
     this.#chunks = [];
     this.#mimeType = mimeType;
@@ -84,11 +95,16 @@ export class StageRecorder {
       this.#frame = requestAnimationFrame(draw);
     };
 
+    // Timeslice keeps chunks flowing so a crash does not lose everything.
+    try {
+      recorder.start(1_000);
+    } catch (error) {
+      for (const track of stream.getTracks()) track.stop();
+      throw error;
+    }
     this.#frame = requestAnimationFrame(draw);
     this.#startedAt = performance.now();
     this.#recorder = recorder;
-    // Timeslice keeps chunks flowing so a crash does not lose everything.
-    recorder.start(1_000);
   }
 
   async stop(): Promise<RecorderResult | null> {
@@ -104,14 +120,50 @@ export class StageRecorder {
       this.#frame = null;
     }
 
-    const blob = await new Promise<Blob>((resolve) => {
-      recorder.onstop = () => resolve(new Blob(this.#chunks, { type: this.#mimeType }));
-      recorder.stop();
-    });
-
-    for (const track of recorder.stream.getTracks()) track.stop();
+    let blob: Blob;
+    try {
+      blob = await new Promise<Blob>((resolve) => {
+        recorder.onstop = () => resolve(new Blob(this.#chunks, { type: this.#mimeType }));
+        recorder.stop();
+      });
+    } finally {
+      for (const track of recorder.stream.getTracks()) track.stop();
+    }
     this.#chunks = [];
 
     return { blob, mimeType: this.#mimeType, durationMs };
+  }
+}
+
+async function requestMicrophone(): Promise<MediaStream> {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error('Microphone recording is unavailable in this build of Windows or Chromium.');
+  }
+
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: {
+        autoGainControl: true,
+        echoCancellation: true,
+        noiseSuppression: true,
+      },
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'NotAllowedError') {
+      throw new Error(
+        'Microphone access was denied. Allow CTRLbot Mirror to use the microphone in Windows privacy settings, then try again.',
+        { cause: error },
+      );
+    }
+    if (error instanceof DOMException && error.name === 'NotFoundError') {
+      throw new Error(
+        'No PC microphone was found. Connect or enable a microphone, then try again.',
+        {
+          cause: error,
+        },
+      );
+    }
+    throw error;
   }
 }

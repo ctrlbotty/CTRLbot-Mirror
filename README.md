@@ -46,9 +46,9 @@ carry data. See [Troubleshooting](docs/TROUBLESHOOTING.md) for connection and dr
 
 - Mirror a phone or tablet at up to its native resolution and 60 fps.
 - Tap, swipe, scroll, type, paste, and use Android navigation from your PC.
-- Add a clean phone frame, backdrop, padding, shadow, and visible touch ripples.
+- Add a clean phone or tablet frame, backdrop, padding, shadow, and visible touch ripples.
 - Save instant screenshots at 1×, 2×, or 3× scale.
-- Record the composed stage—including its frame and backdrop—to WebM or MP4.
+- Record the composed stage—including its frame, backdrop, and your PC microphone—to WebM or MP4.
 - Hide the app chrome with Clean mode for distraction-free capture.
 - Switch a connected phone from USB to wireless ADB.
 - Install and manage apps, browse files, run shell commands, and view logcat.
@@ -73,6 +73,9 @@ from **Studio → Capture**.
 The toolbar below the mirrored screen also provides Back, Home, Recents, notifications, rotation,
 volume, power, screenshot, record, Clean mode, and stop controls.
 
+The first time you record, Windows may ask for microphone access. Recording uses your current
+default PC microphone for narration; audio from the Android device is never captured.
+
 ## Open it from a desktop shortcut
 
 `npm run setup:windows` creates the shortcut as part of the initial setup. To recreate it later, run
@@ -84,9 +87,8 @@ published. For a standalone portable `.exe`, first keep it in a permanent folder
 - Right-click the `.exe`, select **Show more options → Send to → Desktop (create shortcut)**, or
 - From this repository, run `npm run shortcut` after building the portable app.
 
-The shortcut command looks for an installed copy first, then
-`release\win-unpacked\CTRLbot Mirror.exe`, then the newest portable build. You can also choose an
-exact executable:
+The shortcut command looks for an installed copy first, then the newest unpacked or portable build
+under `release`. You can also choose an exact executable:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1 -TargetPath "C:\Apps\CTRLbot Mirror.exe"
@@ -110,7 +112,7 @@ CTRLbot Mirror does not require Android Studio when you use a physical device.
 ## Privacy and downloads
 
 CTRLbot Mirror has no account requirement and sends no telemetry. Device traffic stays on USB or
-your local network.
+your local network. Microphone audio is written only into the recording you save on your PC.
 
 If `adb.exe` is not already available, the app downloads Google's Android platform-tools from
 `dl.google.com` only after you select **Install now**. A source install also downloads the small

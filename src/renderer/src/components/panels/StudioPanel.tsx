@@ -17,12 +17,32 @@ import {
   Toggle,
 } from '../ui.js';
 
-const FRAMES: Array<{ id: FrameStyle; label: string; radius: string; border: string }> = [
-  { id: 'none', label: 'None', radius: 'rounded-sm', border: 'border-dashed' },
-  { id: 'flat', label: 'Flat', radius: 'rounded-md', border: 'border-solid' },
-  { id: 'rounded', label: 'Rounded', radius: 'rounded-xl', border: 'border-solid border-2' },
-  { id: 'pixel', label: 'Pixel', radius: 'rounded-2xl', border: 'border-solid border-2' },
-  { id: 'galaxy', label: 'Galaxy', radius: 'rounded-[14px]', border: 'border-solid' },
+const FRAMES: Array<{
+  id: FrameStyle;
+  label: string;
+  shape: string;
+  border: string;
+}> = [
+  { id: 'none', label: 'None', shape: 'h-7 w-4 rounded-sm', border: 'border-dashed' },
+  { id: 'flat', label: 'Flat', shape: 'h-7 w-4 rounded-md', border: 'border-solid' },
+  {
+    id: 'rounded',
+    label: 'Rounded',
+    shape: 'h-7 w-4 rounded-xl',
+    border: 'border-solid border-2',
+  },
+  {
+    id: 'tablet1',
+    label: 'Tablet 1',
+    shape: 'h-5 w-7 rounded-[3px]',
+    border: 'border-[4px] border-solid',
+  },
+  {
+    id: 'tablet2',
+    label: 'Tablet 2',
+    shape: 'h-5 w-7 rounded-[5px]',
+    border: 'border-[4px] border-solid',
+  },
 ];
 
 const BACKGROUNDS: Array<{ id: StageBackground; label: string; swatch: string }> = [
@@ -69,9 +89,7 @@ export function StudioPanel() {
                 : 'border-ink-700 hover:border-ink-600 hover:bg-ink-800',
             )}
           >
-            <span
-              className={clsx('h-7 w-4 border-ink-500 bg-ink-700', frame.radius, frame.border)}
-            />
+            <span className={clsx('border-ink-500 bg-ink-700', frame.shape, frame.border)} />
             <span className="text-[9px] text-mist-400">{frame.label}</span>
           </button>
         ))}

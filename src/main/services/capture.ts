@@ -1,7 +1,7 @@
 import { dialog, shell } from 'electron';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { SaveResult } from '@shared/types.js';
+import type { RecordingContainer, SaveResult } from '@shared/types.js';
 import { deviceManager } from './device-manager.js';
 import { describeError, scoped } from './logger.js';
 import { settings } from './settings.js';
@@ -58,9 +58,12 @@ export function saveImage(data: Uint8Array, suggestedName: string): Promise<Save
   return saveToCaptureFolder(data, suggestedName, 'png');
 }
 
-export function saveVideo(data: Uint8Array, suggestedName: string): Promise<SaveResult> {
-  const extension = settings.get().studio.recordingFormat;
-  return saveToCaptureFolder(data, suggestedName, extension);
+export function saveVideo(
+  data: Uint8Array,
+  suggestedName: string,
+  container: RecordingContainer,
+): Promise<SaveResult> {
+  return saveToCaptureFolder(data, suggestedName, container);
 }
 
 /**

@@ -14,15 +14,25 @@ export interface FrameGeometry {
   bezelY: number;
   bezelWidth: number;
   bezelHeight: number;
+  /** Outer corner radius of the device body. */
   bezelRadius: number;
+  /** Corner radius of the mirrored screen. */
+  screenRadius: number;
+  /** Total space from the device edge to the mirrored pixels. */
   bezelThickness: number;
+  /** Black trim separating the device body from the mirrored pixels. */
+  innerBorderThickness: number;
 }
 
 export interface FrameSpec {
-  /** Bezel thickness as a fraction of the screen's short edge. */
+  /** Device-body thickness as a fraction of the screen's short edge. */
   thickness: number;
+  /** Fixed logical-pixel black trim between the body and screen. */
+  innerBorder?: number;
   /** Screen corner radius as a fraction of the short edge. */
   radius: number;
+  /** Device-body corner radius; defaults to the screen radius plus its bezel. */
+  outerRadius?: number;
   body: string;
   rim: string;
   punchHole: 'none' | 'center' | 'left';
@@ -46,21 +56,25 @@ const FRAME_SPECS: Record<Exclude<FrameStyle, 'none'>, FrameSpec> = {
     punchHole: 'none',
     sideButtons: true,
   },
-  pixel: {
-    thickness: 0.026,
-    radius: 0.09,
-    body: '#101318',
-    rim: '#3c4455',
-    punchHole: 'center',
-    sideButtons: true,
+  tablet1: {
+    thickness: 0.055,
+    innerBorder: 5,
+    radius: 0.006,
+    outerRadius: 0.012,
+    body: '#0b0e13',
+    rim: '#262c36',
+    punchHole: 'none',
+    sideButtons: false,
   },
-  galaxy: {
-    thickness: 0.018,
-    radius: 0.105,
-    body: '#0a0c11',
-    rim: '#2a3140',
-    punchHole: 'center',
-    sideButtons: true,
+  tablet2: {
+    thickness: 0.055,
+    innerBorder: 5,
+    radius: 0.018,
+    outerRadius: 0.035,
+    body: '#0b0e13',
+    rim: '#262c36',
+    punchHole: 'none',
+    sideButtons: false,
   },
 };
 
@@ -95,13 +109,19 @@ export function measure(
       bezelWidth: screenWidth,
       bezelHeight: screenHeight,
       bezelRadius: 0,
+      screenRadius: 0,
       bezelThickness: 0,
+      innerBorderThickness: 0,
     };
   }
 
   const spec = FRAME_SPECS[studio.frame];
-  const thickness = Math.round(shortEdge * spec.thickness);
+  const deviceThickness = Math.round(shortEdge * spec.thickness);
+  const innerBorderThickness = (spec.innerBorder ?? 0) * scale;
+  const thickness = deviceThickness + innerBorderThickness;
   const screenRadius = shortEdge * spec.radius;
+  const bezelRadius =
+    spec.outerRadius === undefined ? screenRadius + thickness : shortEdge * spec.outerRadius;
 
   const bezelWidth = screenWidth + thickness * 2;
   const bezelHeight = screenHeight + thickness * 2;
@@ -117,8 +137,10 @@ export function measure(
     bezelY: padding,
     bezelWidth,
     bezelHeight,
-    bezelRadius: screenRadius,
+    bezelRadius,
+    screenRadius,
     bezelThickness: thickness,
+    innerBorderThickness,
   };
 }
 
@@ -205,14 +227,13 @@ export function composeFrame(
   paintBackground(ctx, studio.background, studio.customBackground, target.width, target.height);
 
   const spec = studio.frame === 'none' ? null : FRAME_SPECS[studio.frame];
-  const bezelRadius = geometry.bezelRadius + geometry.bezelThickness;
-
   if (spec) {
     if (studio.shadow) {
+      const shadowDepth = Math.min(geometry.bezelThickness, 8 * scale);
       ctx.save();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-      ctx.shadowBlur = geometry.bezelThickness * 6;
-      ctx.shadowOffsetY = geometry.bezelThickness * 2;
+      ctx.shadowBlur = shadowDepth * 6;
+      ctx.shadowOffsetY = shadowDepth * 2;
       ctx.fillStyle = spec.body;
       roundedPath(
         ctx,
@@ -220,7 +241,7 @@ export function composeFrame(
         geometry.bezelY,
         geometry.bezelWidth,
         geometry.bezelHeight,
-        bezelRadius,
+        geometry.bezelRadius,
       );
       ctx.fill();
       ctx.restore();
@@ -253,13 +274,27 @@ export function composeFrame(
       geometry.bezelY,
       geometry.bezelWidth,
       geometry.bezelHeight,
-      bezelRadius,
+      geometry.bezelRadius,
     );
     ctx.fill();
 
     ctx.strokeStyle = spec.rim;
-    ctx.lineWidth = Math.max(1, geometry.bezelThickness * 0.16);
+    ctx.lineWidth = Math.max(scale, Math.min(2 * scale, geometry.bezelThickness * 0.16));
     ctx.stroke();
+  }
+
+  if (spec?.innerBorder && geometry.innerBorderThickness > 0) {
+    const border = geometry.innerBorderThickness;
+    ctx.fillStyle = '#000000';
+    roundedPath(
+      ctx,
+      geometry.screenX - border,
+      geometry.screenY - border,
+      geometry.screenWidth + border * 2,
+      geometry.screenHeight + border * 2,
+      geometry.screenRadius + border,
+    );
+    ctx.fill();
   }
 
   // Mirrored pixels, clipped to the screen's rounded corners.
@@ -270,7 +305,7 @@ export function composeFrame(
     geometry.screenY,
     geometry.screenWidth,
     geometry.screenHeight,
-    geometry.bezelRadius,
+    geometry.screenRadius,
   );
   ctx.clip();
   ctx.drawImage(

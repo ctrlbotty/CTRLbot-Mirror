@@ -121,7 +121,8 @@ const api: CtrlbotApi = {
   },
   capture: {
     saveImage: (data, name) => invoke<SaveResult>(Channel.captureSaveImage, data, name),
-    saveVideo: (data, name) => invoke<SaveResult>(Channel.captureSaveVideo, data, name),
+    saveVideo: (data, name, container) =>
+      invoke<SaveResult>(Channel.captureSaveVideo, data, name, container),
     screenshotViaAdb: (serial) => invoke<SaveResult>(Channel.captureScreenshotViaAdb, serial),
     revealFolder: () => invoke<void>(Channel.captureRevealFolder),
     chooseFolder: () => invoke<string | null>(Channel.captureChooseFolder),

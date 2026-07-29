@@ -8,6 +8,7 @@ import type {
   LogLine,
   MirrorOptions,
   PairingRequest,
+  RecordingContainer,
 } from '@shared/types.js';
 import { adbServer } from '../services/adb-server.js';
 import {
@@ -230,7 +231,11 @@ export function registerIpc(): void {
   /* ---------------------------------------------------------------- capture */
 
   handle(Channel.captureSaveImage, (data: Uint8Array, name: string) => saveImage(data, name));
-  handle(Channel.captureSaveVideo, (data: Uint8Array, name: string) => saveVideo(data, name));
+  handle(
+    Channel.captureSaveVideo,
+    (data: Uint8Array, name: string, container: RecordingContainer) =>
+      saveVideo(data, name, container),
+  );
   handle(Channel.captureScreenshotViaAdb, (serial: string) => screenshotViaAdb(serial));
   handle(Channel.captureRevealFolder, () => revealCaptureFolder());
   handle(Channel.captureChooseFolder, () => chooseCaptureFolder());

@@ -139,11 +139,13 @@ export function Stage() {
                 className="absolute inset-0"
                 style={{
                   background: spec.body,
-                  border: `${Math.max(1, layout.geometry.bezelThickness * layout.scale * 0.16)}px solid ${spec.rim}`,
-                  borderRadius:
-                    (layout.geometry.bezelRadius + layout.geometry.bezelThickness) * layout.scale,
+                  border: `${Math.max(
+                    1,
+                    Math.min(2, layout.geometry.bezelThickness * 0.16) * layout.scale,
+                  )}px solid ${spec.rim}`,
+                  borderRadius: layout.geometry.bezelRadius * layout.scale,
                   boxShadow: studio.shadow
-                    ? `0 ${layout.geometry.bezelThickness * layout.scale * 2}px ${layout.geometry.bezelThickness * layout.scale * 6}px rgba(0,0,0,0.55)`
+                    ? `0 ${Math.min(layout.geometry.bezelThickness, 8) * layout.scale * 2}px ${Math.min(layout.geometry.bezelThickness, 8) * layout.scale * 6}px rgba(0,0,0,0.55)`
                     : undefined,
                 }}
               />
@@ -165,7 +167,11 @@ export function Stage() {
                       top: layout.geometry.screenY * layout.scale,
                       width: layout.geometry.screenWidth * layout.scale,
                       height: layout.geometry.screenHeight * layout.scale,
-                      borderRadius: layout.geometry.bezelRadius * layout.scale,
+                      borderRadius: layout.geometry.screenRadius * layout.scale,
+                      boxShadow:
+                        layout.geometry.innerBorderThickness > 0
+                          ? `0 0 0 ${layout.geometry.innerBorderThickness * layout.scale}px #000`
+                          : undefined,
                     }
                   : { inset: 0 }
               }

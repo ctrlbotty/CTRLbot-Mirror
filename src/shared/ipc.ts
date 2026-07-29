@@ -12,6 +12,7 @@ import type {
   MirrorOptions,
   MirrorSessionInfo,
   PairingRequest,
+  RecordingContainer,
   RemoteFile,
   SaveResult,
   TransferResult,
@@ -169,7 +170,11 @@ export interface CtrlbotApi {
   };
   capture: {
     saveImage(data: Uint8Array, suggestedName: string): Promise<SaveResult>;
-    saveVideo(data: Uint8Array, suggestedName: string): Promise<SaveResult>;
+    saveVideo(
+      data: Uint8Array,
+      suggestedName: string,
+      container: RecordingContainer,
+    ): Promise<SaveResult>;
     screenshotViaAdb(serial: string): Promise<SaveResult>;
     revealFolder(): Promise<void>;
     chooseFolder(): Promise<string | null>;

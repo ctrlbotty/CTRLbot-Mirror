@@ -1,4 +1,4 @@
-import { BrowserWindow, shell } from 'electron';
+import { BrowserWindow, shell, type WebContents } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { Event } from '@shared/ipc.js';
 import { APP_NAME } from '@shared/constants.js';
@@ -30,6 +30,29 @@ export function createMainWindow(): BrowserWindow {
   });
 
   window.once('ready-to-show', () => window.show());
+
+  // The recorder needs only the PC microphone. Keep camera/display capture
+  // denied, and preserve clipboard-read for the existing Ctrl+V feature.
+  const trustedContents = (contents: WebContents | null) => contents === window.webContents;
+  window.webContents.session.setPermissionCheckHandler((contents, permission, _origin, details) => {
+    if (!trustedContents(contents)) return false;
+    if (permission === 'clipboard-read') return true;
+    return permission === 'media' && details.mediaType === 'audio';
+  });
+  window.webContents.session.setPermissionRequestHandler(
+    (contents, permission, callback, details) => {
+      if (!trustedContents(contents)) {
+        callback(false);
+        return;
+      }
+      if (permission === 'clipboard-read') {
+        callback(true);
+        return;
+      }
+      const mediaTypes = 'mediaTypes' in details ? details.mediaTypes : undefined;
+      callback(permission === 'media' && mediaTypes?.length === 1 && mediaTypes[0] === 'audio');
+    },
+  );
 
   const publishState = () => {
     if (!window.isDestroyed()) {

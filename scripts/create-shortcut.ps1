@@ -10,19 +10,24 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
 if (-not $TargetPath) {
-  $candidates = @(
-    (Join-Path $env:LOCALAPPDATA 'Programs\CTRLbot Mirror\CTRLbot Mirror.exe'),
-    (Join-Path $repoRoot 'release\win-unpacked\CTRLbot Mirror.exe')
+  $candidates = @((Join-Path $env:LOCALAPPDATA 'Programs\CTRLbot Mirror\CTRLbot Mirror.exe'))
+
+  $releaseFiles = Get-ChildItem -LiteralPath (Join-Path $repoRoot 'release') `
+    -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -eq 'CTRLbot Mirror.exe' -or $_.Name -like 'CTRLbot Mirror-*-portable.exe' }
+
+  $localBuilds = @(
+    $releaseFiles |
+      Where-Object Name -eq 'CTRLbot Mirror.exe' |
+      Sort-Object LastWriteTime -Descending |
+      Select-Object -ExpandProperty FullName
+    $releaseFiles |
+      Where-Object Name -like 'CTRLbot Mirror-*-portable.exe' |
+      Sort-Object LastWriteTime -Descending |
+      Select-Object -ExpandProperty FullName
   )
 
-  $portable = Get-ChildItem -LiteralPath (Join-Path $repoRoot 'release') `
-    -Filter 'CTRLbot Mirror-*-portable.exe' -File -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending |
-    Select-Object -First 1
-
-  if ($portable) {
-    $candidates += $portable.FullName
-  }
+  $candidates += $localBuilds
 
   $TargetPath = $candidates |
     Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |

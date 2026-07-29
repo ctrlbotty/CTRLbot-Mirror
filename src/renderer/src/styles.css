@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Audiowide';
+  src: url('./assets/Audiowide-Regular.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
 @theme {
   --color-ink-950: #060910;
   --color-ink-900: #0b0f19;
@@ -99,6 +107,12 @@
 
   .selectable {
     user-select: text;
+  }
+
+  .brand-wordmark {
+    font-family: 'Audiowide', var(--font-sans);
+    font-weight: 400;
+    letter-spacing: 0.025em;
   }
 
   /* Keeps mirrored pixels crisp when the stage scales the canvas up. */

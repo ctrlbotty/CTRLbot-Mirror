@@ -80,7 +80,6 @@ export interface DownloadProgress {
 /* ------------------------------------------------------------------- mirror */
 
 export type VideoCodec = 'h264' | 'h265' | 'av1';
-export type AudioCodec = 'opus' | 'aac' | 'flac' | 'raw';
 
 export interface MirrorOptions {
   /** Longest edge in pixels; 0 keeps the native resolution. */
@@ -88,8 +87,6 @@ export interface MirrorOptions {
   videoBitRate: number;
   maxFps: number;
   videoCodec: VideoCodec;
-  audio: boolean;
-  audioCodec: AudioCodec;
   control: boolean;
   stayAwake: boolean;
   showTouches: boolean;
@@ -104,8 +101,6 @@ export const DEFAULT_MIRROR_OPTIONS: MirrorOptions = {
   videoBitRate: 8_000_000,
   maxFps: 60,
   videoCodec: 'h264',
-  audio: false,
-  audioCodec: 'opus',
   control: true,
   stayAwake: true,
   showTouches: false,
@@ -128,7 +123,6 @@ export interface MirrorSessionInfo {
   serial: string;
   metadata: VideoMetadata;
   controlEnabled: boolean;
-  audioEnabled: boolean;
 }
 
 /** Frames pushed down the dedicated MessagePort, not the normal IPC bus. */
@@ -227,8 +221,9 @@ export interface AvdEntry {
 
 /* ------------------------------------------------------------------- studio */
 
-export type FrameStyle = 'none' | 'pixel' | 'galaxy' | 'flat' | 'rounded';
+export type FrameStyle = 'none' | 'flat' | 'rounded' | 'tablet1' | 'tablet2';
 export type StageBackground = 'transparent' | 'dark' | 'light' | 'gradient' | 'custom';
+export type RecordingContainer = 'webm' | 'mp4';
 
 export interface StudioSettings {
   frame: FrameStyle;
@@ -241,7 +236,7 @@ export interface StudioSettings {
   cleanMode: boolean;
   screenshotScale: 1 | 2 | 3;
   includeFrameInCapture: boolean;
-  recordingFormat: 'webm' | 'mp4';
+  recordingFormat: RecordingContainer;
   recordingBitrate: number;
 }
 

@@ -96,12 +96,12 @@ class ScrcpySessionService {
     const scrcpyOptions = new AdbScrcpyOptionsLatest(
       {
         video: true,
-        audio: options.audio,
         videoCodec: options.videoCodec,
         videoBitRate: options.videoBitRate,
         maxFps: options.maxFps,
         maxSize: options.maxSize,
-        audioCodec: options.audioCodec,
+        // Training recordings use the PC microphone, never device audio.
+        audio: false,
         control: options.control,
         stayAwake: options.stayAwake,
         showTouches: options.showTouches,
@@ -141,10 +141,6 @@ class ScrcpySessionService {
     this.#port.postMessage({ kind: 'metadata', metadata });
     this.#pumpVideo(video.stream, callbacks);
 
-    // The audio stream must be drained even when we do not play it, otherwise
-    // the server blocks waiting for a reader.
-    void this.#drainAudio(client);
-
     if (options.turnScreenOffOnStart && client.controller) {
       await client.controller.setScreenPowerMode(AndroidScreenPowerMode.Off);
     }
@@ -158,7 +154,6 @@ class ScrcpySessionService {
       serial,
       metadata,
       controlEnabled: Boolean(client.controller),
-      audioEnabled: options.audio,
     };
   }
 
@@ -328,16 +323,6 @@ class ScrcpySessionService {
       .pipeTo(sink)
       .then(() => this.#finish('The device closed the video stream.', callbacks))
       .catch((error: unknown) => this.#finish(describeError(error), callbacks));
-  }
-
-  async #drainAudio(client: Client): Promise<void> {
-    try {
-      const audio = await client.audioStream;
-      if (!audio || audio.type !== 'success') return;
-      await audio.stream.pipeTo(new WritableStream({ write: () => undefined }));
-    } catch (error) {
-      log.debug('audio stream ended —', describeError(error));
-    }
   }
 
   #pumpServerLog(client: Client, callbacks: SessionCallbacks): void {

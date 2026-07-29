@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Copy, Minus, Square, X } from 'lucide-react';
 import clsx from 'clsx';
+import ctrlbotIcon from '../assets/ic_ctrlbot.svg';
 import { api } from '../lib/api.js';
 import { useStore } from '../state/store.js';
 import { Badge } from './ui.js';
@@ -47,7 +48,10 @@ export function TitleBar() {
   return (
     <header className="drag-region flex h-8 shrink-0 items-center justify-between border-b border-ink-800 bg-ink-950/80 pl-3">
       <div className="flex items-center gap-2.5 text-[11px]">
-        <span className="font-semibold tracking-wide text-mist-200">CTRLbot Mirror</span>
+        <span className="flex items-center gap-2">
+          <img src={ctrlbotIcon} alt="" className="size-4 shrink-0" />
+          <span className="brand-wordmark text-xs text-mist-100">CTRLbot Mirror</span>
+        </span>
         <span className="text-ink-600">|</span>
         {session ? (
           <span className="flex items-center gap-1.5 text-mist-400">
