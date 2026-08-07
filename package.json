@@ -21,6 +21,7 @@
     "start": "electron-vite preview",
     "build": "npm run typecheck && electron-vite build",
     "dist": "npm run build && electron-builder --win --publish never",
+    "dist:installer": "npm run build && electron-builder --win nsis --publish never",
     "dist:portable": "npm run build && electron-builder --win portable --publish never",
     "shortcut": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1",
     "setup:windows": "npm install && npm run dist:portable && npm run shortcut",

@@ -76,19 +76,34 @@ volume, power, screenshot, record, Clean mode, and stop controls.
 The first time you record, Windows may ask for microphone access. Recording uses your current
 default PC microphone for narration; audio from the Android device is never captured.
 
-## Open it from a desktop shortcut
+## Windows installer & distribution
 
-`npm run setup:windows` creates the shortcut as part of the initial setup. To recreate it later, run
-`npm run shortcut`.
+### 1. Windows Installer (`.exe`)
+To build the standard Windows setup wizard (NSIS installer with Desktop and Start Menu shortcuts):
 
-The Windows installer will also create desktop and Start Menu shortcuts when packaged releases are
-published. For a standalone portable `.exe`, first keep it in a permanent folder, then either:
+```powershell
+npm run dist:installer
+```
 
-- Right-click the `.exe`, select **Show more options → Send to → Desktop (create shortcut)**, or
-- From this repository, run `npm run shortcut` after building the portable app.
+This generates `release/CTRLbot Mirror-Setup-<version>.exe`. Running the installer sets up the app under `%LOCALAPPDATA%\Programs\CTRLbot Mirror` with automatic shortcut management and clean uninstallation support.
 
-The shortcut command looks for an installed copy first, then the newest unpacked or portable build
-under `release`. You can also choose an exact executable:
+### 2. Standalone Portable Executable
+To package a single-file portable `.exe` that runs anywhere without installation:
+
+```powershell
+npm run dist:portable
+```
+
+This generates `release/CTRLbot Mirror-<version>-portable.exe`.
+
+### 3. Desktop Shortcut for Local Builds
+`npm run setup:windows` creates a desktop shortcut as part of initial setup. To refresh or recreate it for local builds at any time:
+
+```powershell
+npm run shortcut
+```
+
+The script automatically points to your installed app or the latest build under `release\`. You can also specify an explicit path:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1 -TargetPath "C:\Apps\CTRLbot Mirror.exe"

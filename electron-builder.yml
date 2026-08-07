@@ -38,6 +38,7 @@ nsis:
   createStartMenuShortcut: true
   shortcutName: CTRLbot Mirror
   deleteAppDataOnUninstall: false
+  artifactName: ${productName}-Setup-${version}.${ext}
 
 portable:
   artifactName: ${productName}-${version}-portable.${ext}

@@ -63,15 +63,21 @@ Everything about how captures look.
 
 ### Device frame
 
-Five options — **None**, **Flat**, **Rounded**, **Pixel**, **Galaxy**. They are drawn, not
-photographed, so they stay sharp at any capture scale and adapt to whatever aspect ratio the device
-reports after a rotation. Pixel and Galaxy add a punch-hole camera; Rounded, Pixel and Galaxy add
-side buttons.
+Five options — **None**, **Flat**, **Rounded**, **Tablet 1**, and **Tablet 2**. They are drawn procedurally (not photographed), so they stay crisp at any capture scale and adapt cleanly to device rotation:
+- **Flat**: Sleek, slim smartphone-style border with subtle rounding.
+- **Rounded**: Modern smartphone-style frame with pronounced curved corners.
+- **Tablet 1**: Dedicated tablet framing with dark slate grey bezel styling and subtle outer corners.
+- **Tablet 2**: Dedicated tablet framing with dark slate grey bezel styling and smooth rounded outer corners.
 
 ### Backdrop
 
-Gradient, dark, light, checkerboard (which exports as **real transparency** in the PNG), or a custom
-colour. Plus a padding slider and a drop-shadow toggle.
+- **Gradient**: Refined radial glow centered behind the device for maximum bezel contrast.
+- **Dark**: Deep minimal slate background.
+- **Light**: Crisp high-contrast light background.
+- **Checkerboard**: Exports as **true transparency** in captured PNGs.
+- **Custom**: Pick any custom background color.
+
+Plus an adjustable padding slider, drop-shadow toggle, and clean switch controls.
 
 ### Touch ripples
 

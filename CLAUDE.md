@@ -36,11 +36,13 @@ already written down there.
 ## Commands
 
 ```bash
-npm run dev         # Electron + Vite, HMR on the renderer
-npm run build       # typecheck + bundle
-npm run typecheck   # both tsconfigs
-npm run lint        # zero warnings allowed
-npm run dist        # NSIS installer + portable exe
+npm run dev             # Electron + Vite, HMR on the renderer
+npm run build           # typecheck + bundle
+npm run typecheck       # both tsconfigs
+npm run lint            # zero warnings allowed
+npm run dist            # NSIS installer + portable exe
+npm run dist:installer  # NSIS setup wizard only
+npm run dist:portable   # Single-file portable exe only
 ```
 
 Node 22.12+ required (Vite 7). This machine has it under nvm; `nvm use 22.20.0` if `node -v` says
