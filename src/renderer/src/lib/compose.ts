@@ -43,16 +43,16 @@ const FRAME_SPECS: Record<Exclude<FrameStyle, 'none'>, FrameSpec> = {
   flat: {
     thickness: 0.012,
     radius: 0.02,
-    body: '#12161f',
-    rim: '#2b3348',
+    body: '#1e2430',
+    rim: '#3c475d',
     punchHole: 'none',
     sideButtons: false,
   },
   rounded: {
     thickness: 0.028,
     radius: 0.075,
-    body: '#0d1017',
-    rim: '#333b4d',
+    body: '#1a202c',
+    rim: '#3e4a60',
     punchHole: 'none',
     sideButtons: true,
   },
@@ -61,8 +61,8 @@ const FRAME_SPECS: Record<Exclude<FrameStyle, 'none'>, FrameSpec> = {
     innerBorder: 5,
     radius: 0,
     outerRadius: 0.012,
-    body: '#07090d',
-    rim: '#1d222b',
+    body: '#1f2533',
+    rim: '#414d64',
     punchHole: 'none',
     sideButtons: false,
   },
@@ -71,8 +71,8 @@ const FRAME_SPECS: Record<Exclude<FrameStyle, 'none'>, FrameSpec> = {
     innerBorder: 5,
     radius: 0,
     outerRadius: 0.035,
-    body: '#07090d',
-    rim: '#1d222b',
+    body: '#1f2533',
+    rim: '#414d64',
     punchHole: 'none',
     sideButtons: false,
   },
@@ -157,12 +157,26 @@ function paintBackground(
   }
 
   if (background === 'gradient') {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#131c33');
-    gradient.addColorStop(0.55, '#0d1424');
-    gradient.addColorStop(1, '#0a0f1c');
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.save();
+    const cx = width * 0.5;
+    const cy = height * 0.5;
+    ctx.translate(cx, cy);
+    ctx.scale(width * 1.25, height * 1.25);
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    gradient.addColorStop(0, 'rgba(0, 143, 212, 0.52)');
+    gradient.addColorStop(0.55, 'rgba(0, 143, 212, 0.18)');
+    gradient.addColorStop(0.92, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = gradient;
-  } else if (background === 'dark') {
+    ctx.fillRect(-1, -1, 2, 2);
+    ctx.restore();
+    return;
+  }
+
+  if (background === 'dark') {
     ctx.fillStyle = '#0b0f19';
   } else if (background === 'light') {
     ctx.fillStyle = '#eef2f8';

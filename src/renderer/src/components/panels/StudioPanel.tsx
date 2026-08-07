@@ -46,7 +46,12 @@ const FRAMES: Array<{
 ];
 
 const BACKGROUNDS: Array<{ id: StageBackground; label: string; swatch: string }> = [
-  { id: 'gradient', label: 'Gradient', swatch: 'linear-gradient(135deg,#131c33,#0a0f1c)' },
+  {
+    id: 'gradient',
+    label: 'Gradient',
+    swatch:
+      'radial-gradient(125% 125% at 50% 50%, rgba(0, 143, 212, 0.52) 0%, rgba(0, 143, 212, 0.18) 55%, rgba(0, 0, 0, 0) 92%), #000000',
+  },
   { id: 'dark', label: 'Dark', swatch: '#0b0f19' },
   { id: 'light', label: 'Light', swatch: '#eef2f8' },
   {
@@ -111,7 +116,10 @@ export function StudioPanel() {
             >
               <span
                 className="size-6 rounded-md border border-ink-600"
-                style={{ background: background.swatch, backgroundSize: '10px 10px' }}
+                style={{
+                  background: background.swatch,
+                  backgroundSize: background.id === 'transparent' ? '10px 10px' : undefined,
+                }}
               />
               <span className="text-[9px] text-mist-400">{background.label}</span>
             </button>

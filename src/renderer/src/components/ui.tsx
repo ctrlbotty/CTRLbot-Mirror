@@ -230,14 +230,15 @@ export function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={clsx(
-        'relative h-5 w-9 rounded-full transition-colors disabled:opacity-40',
+        'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-beam-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900 disabled:cursor-not-allowed disabled:opacity-40',
         checked ? 'bg-beam-500' : 'bg-ink-600',
       )}
     >
       <span
+        aria-hidden="true"
         className={clsx(
-          'absolute top-0.5 size-4 rounded-full bg-white transition-transform',
-          checked ? 'translate-x-4.5' : 'translate-x-0.5',
+          'pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ease-in-out',
+          checked ? 'translate-x-4' : 'translate-x-0',
         )}
       />
     </button>

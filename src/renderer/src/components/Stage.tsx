@@ -15,7 +15,8 @@ const BACKGROUNDS: Record<StudioSettings['background'], string> = {
   transparent: 'bg-[repeating-conic-gradient(#141a28_0%_25%,#0e131e_0%_50%)] bg-[length:24px_24px]',
   dark: 'bg-ink-900',
   light: 'bg-mist-100',
-  gradient: 'bg-[linear-gradient(135deg,#131c33_0%,#0d1424_55%,#0a0f1c_100%)]',
+  gradient:
+    'bg-black bg-[radial-gradient(125%_125%_at_50%_50%,rgba(0,143,212,0.52)_0%,rgba(0,143,212,0.18)_55%,rgba(0,0,0,0)_92%)]',
   custom: '',
 };
 
