@@ -7,7 +7,7 @@
     "name": "CTRLbot",
     "email": "natmutt@gmail.com"
   },
-  "license": "Apache-2.0",
+  "license": "MIT",
   "homepage": "https://github.com/ctrlbotty/CTRLbot-Mirror",
   "type": "module",
   "main": "./out/main/index.mjs",
