@@ -142,5 +142,6 @@ scrcpy server component used on the Android device.
 For development setup and project internals, see [Contributing](CONTRIBUTING.md) and
 [Architecture](docs/ARCHITECTURE.md).
 
-CTRLbot Mirror is licensed under the [Apache License 2.0](LICENSE). Third-party notices are in
-[NOTICE](NOTICE).
+CTRLbot Mirror is licensed under the [MIT License](LICENSE). Third-party notices are in
+[NOTICE](NOTICE) — the bundled scrcpy server remains under the Apache License 2.0 and its terms are
+preserved there.

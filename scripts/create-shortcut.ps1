@@ -59,7 +59,12 @@ try {
   $shortcut = $wsh.CreateShortcut($ShortcutPath)
   $shortcut.TargetPath = $resolvedTarget
   $shortcut.WorkingDirectory = Split-Path -Parent $resolvedTarget
-  $shortcut.IconLocation = "$resolvedTarget,0"
+  $iconPath = Join-Path $repoRoot 'build\icon.ico'
+  if (Test-Path -LiteralPath $iconPath -PathType Leaf) {
+    $shortcut.IconLocation = "$iconPath,0"
+  } else {
+    $shortcut.IconLocation = "$resolvedTarget,0"
+  }
   $shortcut.Description = 'Mirror, control, and capture an Android device'
   $shortcut.Save()
 } finally {

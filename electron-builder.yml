@@ -23,6 +23,7 @@ asarUnpack:
   - '**/node_modules/@yume-chan/**'
 
 win:
+  icon: build/icon.ico
   target:
     - target: nsis
       arch: [x64]
