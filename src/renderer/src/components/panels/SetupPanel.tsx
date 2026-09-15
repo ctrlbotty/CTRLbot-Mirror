@@ -106,7 +106,7 @@ export function SetupPanel() {
       <ol className="mt-1">
         <Step
           index={1}
-          state={adbReady ? 'done' : 'active'}
+          state={adbReady ? 'done' : download?.phase === 'error' ? 'warn' : 'active'}
           title={adbReady ? 'Android platform-tools installed' : 'Install Android platform-tools'}
         >
           {adbReady ? (
@@ -127,7 +127,12 @@ export function SetupPanel() {
                 system-wide and nothing else on your PC is touched.
               </Hint>
 
-              {download ? (
+              {download?.phase === 'error' && (
+                <p role="alert" className="text-[11px] text-alert-400">
+                  {download.message}
+                </p>
+              )}
+              {download && download.phase !== 'error' && download.phase !== 'done' ? (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 text-[11px] text-mist-300">
                     <Spinner className="size-3.5 text-beam-400" />
@@ -156,7 +161,7 @@ export function SetupPanel() {
                     disabled={busy}
                     onClick={() => void run(() => api.env.ensureAdb(), 'platform-tools installed')}
                   >
-                    Install now
+                    {download?.phase === 'error' ? 'Retry download' : 'Install now'}
                   </Button>
                   <Button
                     size="sm"

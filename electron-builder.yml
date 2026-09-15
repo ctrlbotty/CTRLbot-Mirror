@@ -3,7 +3,7 @@ productName: CTRLbot Mirror
 copyright: Copyright © 2026 CTRLbot
 
 directories:
-  output: release
+  output: installers
   buildResources: build
 
 files:

@@ -12,7 +12,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 if (-not $TargetPath) {
   $candidates = @((Join-Path $env:LOCALAPPDATA 'Programs\CTRLbot Mirror\CTRLbot Mirror.exe'))
 
-  $releaseFiles = Get-ChildItem -LiteralPath (Join-Path $repoRoot 'release') `
+  $releaseFiles = Get-ChildItem -LiteralPath (Join-Path $repoRoot 'installers') `
     -Recurse -File -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -eq 'CTRLbot Mirror.exe' -or $_.Name -like 'CTRLbot Mirror-*-portable.exe' }
 

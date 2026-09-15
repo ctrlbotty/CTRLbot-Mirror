@@ -1,16 +1,15 @@
-import { app } from 'electron';
+import { app, net } from 'electron';
 import { execFile } from 'node:child_process';
-import { createWriteStream, existsSync } from 'node:fs';
-import { mkdir, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rename, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Readable } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
 import { promisify } from 'node:util';
 import extract from 'extract-zip';
 import { PLATFORM_TOOLS_URL } from '@shared/constants.js';
 import type { AdbSource, DownloadProgress } from '@shared/types.js';
 import { describeError, scoped } from './logger.js';
 import { settings } from './settings.js';
+import { downloadFile } from './download-file.js';
 
 const execFileAsync = promisify(execFile);
 const log = scoped('platform-tools');
@@ -103,73 +102,67 @@ export async function resolveAdb(): Promise<ResolvedAdb | null> {
 export async function downloadPlatformTools(
   onProgress: (progress: DownloadProgress) => void,
 ): Promise<ResolvedAdb> {
-  const targetDir = managedDir();
-  const tempZip = join(app.getPath('temp'), `ctrlbot-platform-tools-${Date.now()}.zip`);
+  const userData = app.getPath('userData');
+  await mkdir(userData, { recursive: true });
+  const staging = await mkdtemp(join(userData, 'platform-tools-install-'));
+  const tempZip = join(staging, 'platform-tools.zip');
 
-  onProgress({
-    phase: 'downloading',
-    receivedBytes: 0,
-    totalBytes: 0,
-    message: 'Contacting dl.google.com…',
-  });
+  try {
+    log.info('downloading platform-tools from', PLATFORM_TOOLS_URL);
+    const { receivedBytes, totalBytes } = await downloadFile(PLATFORM_TOOLS_URL, tempZip, {
+      fetch: (url, init) => net.fetch(url instanceof URL ? url.href : url, init),
+      onProgress: (receivedBytes, totalBytes) =>
+        onProgress({
+          phase: 'downloading',
+          receivedBytes,
+          totalBytes,
+          message: receivedBytes
+            ? 'Downloading Android platform-tools…'
+            : 'Contacting dl.google.com…',
+        }),
+      onRetry: (attempt, error) => {
+        log.warn(`platform-tools download interrupted; retry ${attempt}/3`, error);
+        onProgress({
+          phase: 'downloading',
+          receivedBytes: 0,
+          totalBytes: 0,
+          message: `Download interrupted. Retrying (${attempt}/3)…`,
+        });
+      },
+    });
+    log.info('platform-tools downloaded', { receivedBytes, totalBytes });
+    onProgress({
+      phase: 'extracting',
+      receivedBytes,
+      totalBytes,
+      message: 'Extracting platform-tools…',
+    });
 
-  log.info('downloading platform-tools from', PLATFORM_TOOLS_URL);
-  const response = await fetch(PLATFORM_TOOLS_URL, { redirect: 'follow' });
-  if (!response.ok || !response.body) {
-    throw new Error(`platform-tools download failed: HTTP ${response.status}`);
-  }
-
-  const totalBytes = Number(response.headers.get('content-length') ?? 0);
-  let receivedBytes = 0;
-  let lastReport = 0;
-
-  const source = Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]);
-  source.on('data', (chunk: Buffer) => {
-    receivedBytes += chunk.length;
-    // Throttle so we do not flood the renderer with progress events.
-    const now = Date.now();
-    if (now - lastReport > 120) {
-      lastReport = now;
-      onProgress({
-        phase: 'downloading',
-        receivedBytes,
-        totalBytes,
-        message: 'Downloading Android platform-tools…',
-      });
+    // Validate the staged bundle before replacing the managed installation.
+    try {
+      await extract(tempZip, { dir: staging });
+    } catch (error) {
+      throw new Error(
+        'The platform-tools ZIP is incomplete or damaged. Please retry the download.',
+        {
+          cause: error,
+        },
+      );
     }
-  });
-
-  await mkdir(app.getPath('temp'), { recursive: true });
-  await pipeline(source, createWriteStream(tempZip));
-
-  onProgress({
-    phase: 'extracting',
-    receivedBytes,
-    totalBytes,
-    message: 'Extracting platform-tools…',
-  });
-
-  // The archive already contains a top-level `platform-tools/` folder, so
-  // extract into userData and it lands exactly where managedAdb() expects.
-  await rm(targetDir, { recursive: true, force: true });
-  await extract(tempZip, { dir: app.getPath('userData') });
-  await rm(tempZip, { force: true });
-
-  const adbPath = managedAdb();
-  const version = await readVersion(adbPath);
-  if (!version) {
-    throw new Error('platform-tools were extracted but adb.exe did not run. Antivirus quarantine?');
+    const version = await readVersion(join(staging, 'platform-tools', 'adb.exe'));
+    if (!version) {
+      throw new Error(
+        'platform-tools were extracted but adb.exe did not run. Antivirus quarantine?',
+      );
+    }
+    await rm(managedDir(), { recursive: true, force: true });
+    await rename(join(staging, 'platform-tools'), managedDir());
+    onProgress({ phase: 'done', receivedBytes, totalBytes, message: `Installed ${version}` });
+    log.info('platform-tools ready at', managedAdb());
+    return { path: managedAdb(), source: 'managed', version };
+  } finally {
+    await rm(staging, { recursive: true, force: true });
   }
-
-  onProgress({
-    phase: 'done',
-    receivedBytes,
-    totalBytes,
-    message: `Installed ${version}`,
-  });
-  log.info('platform-tools ready at', adbPath);
-
-  return { path: adbPath, source: 'managed', version };
 }
 
 /** Resolves adb, downloading Google's bundle when nothing usable is found. */

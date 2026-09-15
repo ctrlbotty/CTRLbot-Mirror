@@ -16,7 +16,7 @@ that step fails, mirroring will not work — run `npm run fetch:scrcpy` to retry
 | ---------------------- | ---------------------------------------------------------------------- |
 | `npm run dev`          | Electron + Vite with HMR on the renderer                               |
 | `npm run build`        | Typecheck, then bundle main / preload / renderer into `out/`           |
-| `npm run dist`         | Build, then produce an NSIS installer and a portable exe in `release/` |
+| `npm run dist`         | Build, then produce an NSIS installer and a portable exe in `installers/` |
 | `npm run typecheck`    | Both tsconfigs — node and web                                          |
 | `npm run lint`         | ESLint, zero warnings allowed                                          |
 | `npm run format`       | Prettier                                                               |

@@ -50,6 +50,6 @@ jobs:
         with:
           name: windows-build
           path: |
-            release/*.exe
-            release/*.yml
+            installers/*.exe
+            installers/*.yml
           if-no-files-found: error

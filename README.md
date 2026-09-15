@@ -85,7 +85,7 @@ To build the standard Windows setup wizard (NSIS installer with Desktop and Star
 npm run dist:installer
 ```
 
-This generates `release/CTRLbot Mirror-Setup-<version>.exe`. Running the installer sets up the app under `%LOCALAPPDATA%\Programs\CTRLbot Mirror` with automatic shortcut management and clean uninstallation support.
+This generates `installers/CTRLbot Mirror-Setup-<version>.exe`. Running the installer sets up the app under `%LOCALAPPDATA%\Programs\CTRLbot Mirror` with automatic shortcut management and clean uninstallation support.
 
 ### 2. Standalone Portable Executable
 To package a single-file portable `.exe` that runs anywhere without installation:
@@ -94,7 +94,7 @@ To package a single-file portable `.exe` that runs anywhere without installation
 npm run dist:portable
 ```
 
-This generates `release/CTRLbot Mirror-<version>-portable.exe`.
+This generates `installers/CTRLbot Mirror-<version>-portable.exe`.
 
 ### 3. Desktop Shortcut for Local Builds
 `npm run setup:windows` creates a desktop shortcut as part of initial setup. To refresh or recreate it for local builds at any time:
@@ -103,7 +103,7 @@ This generates `release/CTRLbot Mirror-<version>-portable.exe`.
 npm run shortcut
 ```
 
-The script automatically points to your installed app or the latest build under `release\`. You can also specify an explicit path:
+The script automatically points to your installed app or the latest build under `installers\`. You can also specify an explicit path:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1 -TargetPath "C:\Apps\CTRLbot Mirror.exe"

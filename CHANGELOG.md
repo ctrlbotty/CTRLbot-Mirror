@@ -6,6 +6,15 @@ All notable changes are recorded here. Format follows
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-09-15
+
+### Fixed
+
+- Prevent loss of ZIP bytes when downloading Android platform-tools.
+- Retry interrupted downloads, check their size, and clean up failed downloads.
+- Validate extracted ADB before replacing the managed installation.
+- Show a retry button after setup fails instead of leaving the progress spinner running.
+
 ## [0.1.0] — 2026-07-28
 
 First working build.
