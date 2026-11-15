@@ -7,6 +7,10 @@ AVD launcher.
 
 ## Next
 
+**Virtual devices without Android Studio.** Create, boot, reset and drive emulators from Mirror,
+with presets matching CTRLbot IoT's phone, 7" panel and 10" tablet. Also fixes Stop, which today
+disconnects instead of shutting the emulator down. Plan: [`SPRINT-virtual-devices.md`](SPRINT-virtual-devices.md).
+
 **Audio.** The scrcpy server already streams Opus and the session drains it; it is thrown away. It
 needs an `AudioDecoder` + `AudioContext` in the renderer, and mixing into the `MediaRecorder` stream
 so recordings have sound. This is the biggest gap for training videos.
