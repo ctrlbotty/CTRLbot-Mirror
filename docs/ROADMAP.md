@@ -1,9 +1,6 @@
 # Roadmap
 
-## v0.1 — shipped
-
-Mirroring, control, the Studio capture set, guided setup, wireless pairing, apps/files/shell/logcat,
-AVD launcher.
+See the [user guide](USER_GUIDE.md) for current behavior and the [changelog](../CHANGELOG.md) for shipped work.
 
 ## Next
 
