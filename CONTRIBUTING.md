@@ -3,12 +3,11 @@
 ## Setup
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Node **22.12+** (see `.nvmrc`). `npm install` fetches the scrcpy server jar with a pinned SHA-256; if
-that step fails, mirroring will not work — run `npm run fetch:scrcpy` to retry.
+Node **22.12+** (see `.nvmrc`). Installation fetches the scrcpy server jar and verifies its pinned SHA-256. If it fails, run `npm run fetch:scrcpy` to retry.
 
 ## Scripts
 
@@ -19,10 +18,11 @@ that step fails, mirroring will not work — run `npm run fetch:scrcpy` to retry
 | `npm run dist`         | Build, then produce an NSIS installer and a portable exe in `installers/` |
 | `npm run typecheck`    | Both tsconfigs — node and web                                          |
 | `npm run lint`         | ESLint, zero warnings allowed                                          |
+| `npm run test:download` | Check interrupted downloads and Windows ZIP extraction                |
 | `npm run format`       | Prettier                                                               |
 | `npm run fetch:scrcpy` | Re-download the scrcpy server jar                                      |
 
-Run `npm run typecheck && npm run lint` before pushing; CI runs both.
+Run `npm run test:download`, `npm run lint`, `npm run format:check` and `npm run build` before pushing. CI runs the same checks and uploads installer artifacts for version tags.
 
 ## Layout
 

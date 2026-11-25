@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { ReadableStream } from 'node:stream/web';
 import { downloadFile } from '../src/main/services/download-file.ts';
+import { extractPlatformTools } from '../src/main/services/platform-tools-archive.ts';
 
 const { Response } = globalThis;
 
@@ -13,6 +14,36 @@ async function fixture(t) {
   t.after(() => rm(root, { recursive: true, force: true }));
   return { root, destination: join(root, 'bundle.zip') };
 }
+
+test(
+  'Windows extracts a ZIP to a literal destination path',
+  { skip: process.platform !== 'win32' },
+  async (t) => {
+    const { root, destination } = await fixture(t);
+    // ZIP containing platform-tools/version.txt.
+    const archive = Buffer.from(
+      'UEsDBBQAAAAAAPGTeF2Yjo56CQAAAAkAAAAaAAAAcGxhdGZvcm0tdG9vbHMvdmVyc2lvbi50eHR2ZXJzaW9uIDFQSwECFAAUAAAAAADxk3hdmI6OegkAAAAJAAAAGgAAAAAAAAAAAAAAgAEAAAAAcGxhdGZvcm0tdG9vbHMvdmVyc2lvbi50eHRQSwUGAAAAAAEAAQBIAAAAQQAAAAAA',
+      'base64',
+    );
+    await writeFile(destination, archive);
+    const extracted = join(root, 'device tools [test]');
+    await extractPlatformTools(destination, extracted);
+    assert.equal(
+      await readFile(join(extracted, 'platform-tools', 'version.txt'), 'utf8'),
+      'version 1',
+    );
+  },
+);
+
+test(
+  'Windows reports a damaged ZIP as an extraction failure',
+  { skip: process.platform !== 'win32' },
+  async (t) => {
+    const { root, destination } = await fixture(t);
+    await writeFile(destination, 'incomplete download');
+    await assert.rejects(() => extractPlatformTools(destination, root));
+  },
+);
 
 test('an immediately flowing body is saved byte-for-byte, including its ZIP header', async (t) => {
   const { destination } = await fixture(t);

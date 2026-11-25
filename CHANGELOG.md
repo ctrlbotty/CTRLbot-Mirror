@@ -6,6 +6,11 @@ All notable changes are recorded here. Format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Use Windows ZIP extraction for downloaded Android platform-tools.
+- Run platform-tools download tests in CI and build installer artifacts on version tags.
+
 ## [1.0.1] — 2026-09-15
 
 ### Fixed

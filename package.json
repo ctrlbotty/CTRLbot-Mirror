@@ -42,9 +42,7 @@
     "@yume-chan/adb-server-node-tcp": "^2.5.2",
     "@yume-chan/scrcpy": "^2.3.0",
     "@yume-chan/stream-extra": "^2.6.1",
-    "electron-log": "^5.4.4",
-    "electron-updater": "^6.8.9",
-    "extract-zip": "^2.0.1"
+    "electron-log": "^5.4.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
