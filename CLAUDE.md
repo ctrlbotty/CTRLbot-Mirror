@@ -1,5 +1,7 @@
 # CTRLbot Mirror — notes for Claude
 
+Follow the [Git rules in AGENTS.md](AGENTS.md#git-rules).
+
 Windows Electron app that mirrors, controls and captures Android devices over ADB. Built for making
 training videos and for helping end users set up their own phone.
 
