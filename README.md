@@ -7,26 +7,20 @@ It is useful for product demos, training videos, app walkthroughs, support sessi
 device setup. It works with a physical Android device over USB or Wi-Fi and with Android Studio
 virtual devices.
 
-## Quick start
+## Download
 
-With [Node.js 22.12 or newer](https://nodejs.org/) installed, open a terminal in this folder and run:
+Download the Windows x64 installer or portable executable from [GitHub Releases](https://github.com/ctrlbotty/CTRLbot-Mirror/releases/latest). The installer adds Windows shortcuts. The portable build runs directly.
 
-```powershell
-npm run setup:windows
-```
+## Run from source
 
-That one command installs the app's dependencies, builds the Windows app, and creates a
-**CTRLbot Mirror** shortcut on your desktop. Double-click the shortcut whenever you want to open the
-app.
-
-To open the source version immediately without creating a packaged app, run this single line from
-Command Prompt or PowerShell:
+With [Node.js 22.12 or newer](https://nodejs.org/) installed, run:
 
 ```powershell
-cmd /c "npm install && npm run dev"
+npm ci
+npm run dev
 ```
 
-Once built, the app itself does not require Node.js to be running.
+`npm run setup:windows` installs dependencies, packages a portable build and creates a desktop shortcut. Packaged builds run without Node.js.
 
 ## Connect your first device
 
@@ -76,38 +70,17 @@ volume, power, screenshot, record, Clean mode, and stop controls.
 The first time you record, Windows may ask for microphone access. Recording uses your current
 default PC microphone for narration; audio from the Android device is never captured.
 
-## Windows installer & distribution
+## Package a Windows build
 
-### 1. Windows Installer (`.exe`)
-To build the standard Windows setup wizard (NSIS installer with Desktop and Start Menu shortcuts):
+Run one of these commands from the repository root after installing dependencies:
 
 ```powershell
+npm run dist
 npm run dist:installer
-```
-
-This generates `installers/CTRLbot Mirror-Setup-<version>.exe`. Running the installer sets up the app under `%LOCALAPPDATA%\Programs\CTRLbot Mirror` with automatic shortcut management and clean uninstallation support.
-
-### 2. Standalone Portable Executable
-To package a single-file portable `.exe` that runs anywhere without installation:
-
-```powershell
 npm run dist:portable
 ```
 
-This generates `installers/CTRLbot Mirror-<version>-portable.exe`.
-
-### 3. Desktop Shortcut for Local Builds
-`npm run setup:windows` creates a desktop shortcut as part of initial setup. To refresh or recreate it for local builds at any time:
-
-```powershell
-npm run shortcut
-```
-
-The script automatically points to your installed app or the latest build under `installers\`. You can also specify an explicit path:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1 -TargetPath "C:\Apps\CTRLbot Mirror.exe"
-```
+These build both packages, the NSIS installer, or the portable executable, respectively. Output goes to `installers/`. Run `npm run shortcut` to recreate the desktop shortcut for an installed or locally packaged build.
 
 ## Wireless devices
 

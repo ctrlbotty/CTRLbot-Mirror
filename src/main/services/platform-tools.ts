@@ -4,12 +4,12 @@ import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rename, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import extract from 'extract-zip';
 import { PLATFORM_TOOLS_URL } from '@shared/constants.js';
 import type { AdbSource, DownloadProgress } from '@shared/types.js';
 import { describeError, scoped } from './logger.js';
 import { settings } from './settings.js';
 import { downloadFile } from './download-file.js';
+import { extractPlatformTools } from './platform-tools-archive.js';
 
 const execFileAsync = promisify(execFile);
 const log = scoped('platform-tools');
@@ -140,7 +140,7 @@ export async function downloadPlatformTools(
 
     // Validate the staged bundle before replacing the managed installation.
     try {
-      await extract(tempZip, { dir: staging });
+      await extractPlatformTools(tempZip, staging);
     } catch (error) {
       throw new Error(
         'The platform-tools ZIP is incomplete or damaged. Please retry the download.',

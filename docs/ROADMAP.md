@@ -27,16 +27,15 @@ demos that need to show the physical device and its screen at once.
 - **Real app labels**, if a fast enough path exists (`--list-apps` on the scrcpy server is one).
 - **Session presets** — named bundles of Studio + stream settings for different video series.
 - **Annotation tools** — arrows and callouts drawn over the stage, exported with the capture.
-- **Auto-update** via `electron-updater` (the dependency is already there; releases are not wired).
+- **Auto-update.** Set up a signed release feed and verify upgrades from installers.
 - **Screen-off recording with device audio** for hands-free capture.
 
-## Known limitations
+## Design constraints
 
 - **One session at a time.** A second scrcpy session fights the first over the device socket. Two
   devices side by side would need per-session state throughout `scrcpy-session.ts`.
 - **`FLAG_SECURE` surfaces are black.** Netflix, banking apps and password managers blank the
   capture by design. Not something to work around.
-- **The scrcpy version is pinned to 3.3.3** — the newest that `@yume-chan/adb-scrcpy` implements.
-  See [`RESEARCH.md` §3](RESEARCH.md).
+- **scrcpy is pinned for client/server compatibility.** Update the server version, checksum and client options together. See [Upgrading scrcpy](../CONTRIBUTING.md#bumping-scrcpy).
 - **Windows only.** Nothing here is deeply Windows-specific except `adb.exe` discovery and the
   platform-tools download URL, but it is neither built nor tested elsewhere.
